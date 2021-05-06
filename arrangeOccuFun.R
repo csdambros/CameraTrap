@@ -143,10 +143,10 @@ effData_arr3<-array(effData_mat3,dim(occ))
 effort_mismatch<-occ>0&is.na(effData_arr3)
 
 if(sum(effort_mismatch)>0){
-  cat("Occurrences do not overlap with temporal region of effort and will be removed (NA)\n")
+  cat(sum(effort_mismatch),"(final) occurrences do not overlap with temporal region of effort and will be replaced by NA\n")
   
   if(error!='show'){
-    cat("Use error = 'show' to save the information in the output (package reshape2 required)\n")}
+    cat("Use error = 'show' to show which input rows contain errors (package reshape2 required)\n")}
   else{
   
   resh_avail<-require("reshape2")
