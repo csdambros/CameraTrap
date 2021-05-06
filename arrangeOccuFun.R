@@ -16,6 +16,7 @@ cat("3. Final date in date format\n")
 arrangeOccu<-function(occData,effData=NULL,interval="days",plot=FALSE,occFun=min,simplify=TRUE,error='hide'){
 
   occData<-na.omit(occData)
+  error<-c("show","hide")[pmatch(error,c("show","hide"))]
   
   if(ncol(occData)<3){
     occData[,3]<-1
