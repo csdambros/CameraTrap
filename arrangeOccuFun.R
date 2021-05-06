@@ -13,7 +13,7 @@ cat("1. Site ID (camera, plot, etc.)\n")
 cat("2. Initial date in date format\n")
 cat("3. Final date in date format\n")
 
-arrangeOccu<-function(occData,effData=NULL,interval="days",plot=FALSE,occFun=min,simplify=TRUE){
+arrangeOccu<-function(occData,effData=NULL,interval="days",plot=FALSE,occFun=min,simplify=TRUE,error='hide'){
 
   occData<-na.omit(occData)
   
@@ -30,9 +30,15 @@ arrangeOccu<-function(occData,effData=NULL,interval="days",plot=FALSE,occFun=min
     effData <- data.frame(Site=levels(as.factor(occData[,1])),initDate=min(occData[,2]),endDate=max(occData[,2]))
   }
   
-  
   occData[,1]<-as.factor(occData[,1])
   effData[,1]<-factor(effData[,1],levels = levels(occData[,1]))
+  
+  sites_out<-!levels(occData[,1])%in%effData[,1]
+  if(sum(sites_out)>0){
+    stop("Site in occData missing from effort data")
+  }
+  
+  
 ## Create effort matrix
 date_range<-range(effData[,2],effData[,3],na.rm=TRUE)
 
@@ -123,10 +129,6 @@ occ<-tapply(occData[,3],
 
 
 
-dim(occ)
-range(occ)
-range(occ,na.rm = TRUE)
-sum(occ,na.rm = TRUE)
 
 # Check if effort and occurrence data are compatible
 sum(dimnames(occ)[[1]]!=effData_mat2[,1])==0
@@ -137,6 +139,30 @@ range(occ)
 
 
 effData_arr3<-array(effData_mat3,dim(occ))
+
+effort_mismatch<-occ>0&is.na(effData_arr3)
+
+if(sum(effort_mismatch)>0){
+  cat("Occurrences do not overlap with temporal region of effort and will be removed (NA)\n")
+  
+  if(error!='show'){
+    cat("Use error = 'show' to save the information in the output (package reshape2 required)\n")}
+  else{
+  
+  resh_avail<-require("reshape2")
+  
+  if(resh_avail){
+    effort_mismatch2<-melt(effort_mismatch)
+    occData2<-data.frame(Var1=occData[,1],Var2=occData_cut,Var3=occData[,4],occData)
+    
+    errors<-merge(occData2,effort_mismatch2[effort_mismatch,1:3],by.x = c("Var1","Var2","Var3"),by.y = c("Var1","Var2","Var3"))[,colnames(occData)]
+    
+  }else{
+    cat("Pacakage 'reshape2' required to save missing data...\n")
+  }
+  }
+  
+}
 # Remove zeroes where true NAs
 occ2<-occ*effData_arr3
 
@@ -144,10 +170,12 @@ if(dim(occ2)[3]==1&simplify){
    occ2<-occ2[,,1]
  }
 
-return(occ2)
-
+resu<-occ2
+if(error=='show'){
+  if(resh_avail){
+  resu<-list(occ=occ2,errors=errors)}
 }
 
-
-
+return(resu)
+}
 
