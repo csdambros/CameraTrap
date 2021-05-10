@@ -126,7 +126,7 @@ arrangeOccu<-function(occData,effData=NULL,interval="days",plot=FALSE,occFun=len
         errors<-merge(occData22,effort_mismatch2[effort_mismatch,1:3],by.x = c("Var1","Var2","Var3"),by.y = c("Var1","Var2","Var3"))[,colnames(occData)]
         
       }else{
-        cat("Install pacakage 'reshape2' to save output missing data\n")
+        cat("Install pacakage 'reshape2' to output missing data\n")
       }
     
   }
