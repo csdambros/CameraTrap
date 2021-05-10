@@ -13,7 +13,7 @@ cat("1. Site ID (camera, plot, etc.)\n")
 cat("2. Initial date in date format\n")
 cat("3. Final date in date format\n")
 
-arrangeOccu2<-function(occData,effData=NULL,interval="days",plot=FALSE,occFun=length,simplify=TRUE,error='hide'){
+arrangeOccu<-function(occData,effData=NULL,interval="days",plot=FALSE,occFun=length,simplify=TRUE,error='hide'){
   
   effData<-na.omit(effData)
   
